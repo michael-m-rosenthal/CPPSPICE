@@ -11,6 +11,17 @@ I think all you need is c shell, gcc, and g++ installed on your system.
 
 ## Build Instructions
 
+First add some directories with the following command:
+
+```
+mkdir bin
+mkdir build
+mkdir lib
+mkdir exe
+```
+
+
+
 Go to the `cpsice` directory and run the `makeall.csh` command as usual.
 Please note that you may need to use the command `chmod +x makeall.csh`
 

@@ -23,6 +23,7 @@ I made a C++ class that does the same thing.
 The header file is `.h`.
 Some people use `.hpp` to distinguish between C++ and C headers.
 At one point I did so as well, and I do not remember why I stopped favoring that convention.
+There is probably a good reason, but I might consider reinstating using `.hpp` c++ code for this project to distinguish between the two.
 
 Anyway, you will find Doxygen markup for all the variables in the header so that people do not need to look at tutorials, websites, or pdf documents.
 I try to make the header contain the documentation for the code so that this is the only documentation people need.

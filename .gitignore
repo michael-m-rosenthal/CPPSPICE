@@ -35,3 +35,6 @@ cspice/bin/**
 cspice/build/**
 cspice/lib/**
 cspice/exe/**
+
+bin/**
+build/**

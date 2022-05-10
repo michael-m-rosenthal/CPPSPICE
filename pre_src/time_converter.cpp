@@ -5,6 +5,7 @@
 * Michael M. Rosenthal
 */
 
+#include "time_converter.hpp"
 #include <stdio.h>
 #include "SpiceUsr.h"
 #include <vector>

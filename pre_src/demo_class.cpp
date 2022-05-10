@@ -1,4 +1,4 @@
-#include "demo_class.h"
+#include "demo_class.hpp"
 #include <stdio.h>
 #include "SpiceUsr.h"
 
@@ -114,4 +114,3 @@ void demo_class::display_results(){
             dpr_c() * emissn
         );
 }
-

@@ -60,7 +60,7 @@ sudo snap install atom --classic
 
 I have already included `cspice` in this repository
 In retrospect, I probably should have git ignored this entire directory.
-I make a script called `download_and_unzip_linux_64_cspice.sh` that will download and install unzip CSPICE.
+I made a script called `download_and_unzip_linux_64_cspice.sh` that will download and unzip CSPICE.
 The script requires `wget`.
 If you do not already have wget, you can install it with the following line of code with root or sudo privledges.
 
@@ -92,7 +92,7 @@ chmod +x makeall.csh
 ./makeall.csh
 ```
 
-### Build Dockerfile Testing Environment
+## A Dockerfile for testing code
 
 I have also included make a Dockerfile that will create a testing environment that can be used for automated testing later.
 I will not have time to go into much detail with that for this coding assignment, but I will mention that docker images like this are commonly used for CI/CD DEVOPS using Jenkins or Gitlab runners.
@@ -106,28 +106,10 @@ I have found that the benefits outweigh the drawbacks on the projects that I hav
 
 My main reason for doing the dockerfile is so that I can test the scripts and commands I have documented for setting up the dev environment using a system without the dev tools already installed.
 
-## Build Instructions
 
-Go to the `cpsice` directory and run the `makeall.csh` command as usual.
-Please note that you may need to use the command `chmod +x makeall.csh`
+### Descriptions of cpp files I had before starting
 
-After you run the `makeall.csh` command move to the `src_cpp` directory.
-
-There is a `mkcppprodct.csh` that will build a c program that came from one other SPICE turorials on the NAIF website.
-
-I made a C++ class that does the same thing.
-
-The header file is `.h`.
-Some people use `.hpp` to distinguish between C++ and C headers.
-At one point I did so as well, and I do not remember why I stopped favoring that convention.
-There is probably a good reason, but I might consider reinstating using `.hpp` c++ code for this project to distinguish between the two.
-
-Anyway, you will find Doxygen markup for all the variables in the header so that people do not need to look at tutorials, websites, or pdf documents.
-I try to make the header contain the documentation for the code so that this is the only documentation people need.
-I like to follow it up with example code usage too.
-
-There were quite a few variables I had no idea about how to describe.
-I did my best to describe the ones that made sense to me, and I put todo placeholders for the rest.
-
-The `demo_class.cpp` file is where I define all the class methods.
-I do not use any Doxygen in the `.cpp` files except for the at the header of the file.
+Before I started this project, I had some c and c++ code that I wrote to help me understand the CSPICE toolkit.
+I do not want to go into much detail about them because I am going to do a much more thorough job explaining everything related to this coding project.
+Rather than deleting them, I put it in the `pre_src` directory.
+If you are interested, you can `cd` into the `pre_src`directory and build the shared object libraries and binaries using the `mkcppprodct.csh`.

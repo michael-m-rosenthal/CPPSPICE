@@ -18,3 +18,7 @@ RUN mkdir -p /CPPSPICE/cspice/lib
 RUN mkdir -p /CPPSPICE/cspice/exe
 
 RUN cd /CPPSPICE/cspice; chmod +x makeall.csh; ./makeall.csh
+
+COPY get_data.sh /CPPSPICE/
+RUN chmod +x /CPPSPICE/get_data.sh
+RUN cd /CPPSPICE/; ./get_data.sh

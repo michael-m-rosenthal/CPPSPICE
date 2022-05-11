@@ -2,7 +2,6 @@
 * @file time_converter.cpp
 * @brief Converting between UTC and Ephemeris Time (LSK)
 *
-* Michael M. Rosenthal
 */
 
 #include "time_converter.hpp"

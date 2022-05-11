@@ -17,22 +17,19 @@ If you add the two areas you computed, what do you expect to get?
 It is just half the total area of the glass square, right?
 
 Water is not very easy to compress.
-If you were to try and physically compress water with some *clever* device, the mechanism by which you are compressing the water is prone to catastrophically fail before you can significantly compress the water.
 If you pour it from one cup to another cup, the volume remains the same.
-
-
-So, if you gently shook the glass around and made waves appear at the waterline, the area below the waterline to the left vertical line plus the area below the waterline to the right of the vertical line would still always be half of the total area of the glass square at all times.
+So, if you gently shook the glass around and made waves appear at the waterline, the area below the waterline to the left of vertical line plus the area below the waterline to the right of the vertical line would still always be half of the total area of the glass square at all times.
 
 Image that you took a picture of the waterline in motion so that you could measure the divided areas below the waterline.
 If you carefully measure the total area that is below the waterline to the left of the vertical line you drew, then you do not need to carefully measure the area to the right of the waterline if you know that the total area below the waterline is half of the total area of the glass square.
 You can just subtract what you measured from the left from the total area under the waterline.
 
-The fundamental theorem of calculus certainly implies that this is the case, and this is how it is commonly used for computing definite integrals.
+The fundamental theorem of calculus implies that this is the case, and this is how it is commonly used for computing definite integrals.
 But it also tells us considerably more than this.
 It tells us that definite integration is an anti-derivative.
-To explain this, we would need to understand what about what a definite integral is, and that requires an understanding of what a limit is, and some intuition about some common cases for limits which are known to converge.
-These are the kinds of things that they typically teach in an introductory calculus course.
+To explain this, we would need to understand what a definite integral is, and that requires an understanding of what a limit is, and some intuition about common cases for limits which are known to converge.
+These are the kinds of things that are typically taught in an introductory calculus course.
 With these tools, you could probably understand the fundamental theorem of calculus within the context of Riemann integration.
-However, to really understand the fundamental theorem of calculus, your need to know much more than that.
+However, to really understand the fundamental theorem of calculus, you will need to know much more than that.
 You will need know some topics that you typically learn from real analysis, and then you will need to understand some measure theory.
 With these tools and some persistence, you may be able to acquire an appreciation of the Fundamental Theorem of Calculus.

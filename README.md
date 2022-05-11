@@ -113,3 +113,47 @@ Before I started this project, I had some c and c++ code that I wrote to help me
 I do not want to go into much detail about them because I am going to do a much more thorough job explaining everything related to this coding project.
 Rather than deleting them, I put it in the `pre_src` directory.
 If you are interested, you can `cd` into the `pre_src`directory and build the shared object libraries and binaries using the `mkcppprodct.csh`.
+
+
+### Description of Data
+
+
+The following kernels are loaded in the `gfoclt_c` example found [here](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/info/mostused.html#3)
+```
+furnsh_c( "naif0008.tls"  );
+furnsh_c( "de421.bsp"     );
+furnsh_c( "pck00008.tpc"  );
+```
+
+I need a lsk, a spk and a pck to use `gfoclt_c`.
+
+The generic kernels can be downloaded manually [here](https://naif.jpl.nasa.gov/naif/data_generic.html).
+
+At the time I am writing this, the [aareadme.txt](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/aareadme.txt) says that `naif0012.tls` is the latest leap second kernel.
+
+In [aareadme_de430-de431.txt](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/aareadme_de430-de431.txt) it says,
+
+```
+For those whose need of a planet ephemeris can be satisfied by the DE430 time span, and for
+those in need of the most accurate JPL-produced lunar ephemeris, DE430 is now considered
+the official export ephemeris.
+
+  de430.bsp
+  Approximate file size:   120 Mbytes
+  Approximate time span:   1550 Jan 01 to 2650 Jan 22
+```
+
+So I think I need to use `de430.bsp` instead of `de421.bsp`.
+I do not think that I need `de431.bsp` because I am not doing calculations deep in the past or deep into the future.
+
+I am pretty sure I do not need the binary planetary constants for this calculation.
+I see `pck00008.tpc` listed in the old_version directory and it looks like `pck00010.tpc` is the latest version.
+I am going to presume that I need `pck00010.tpc`.
+
+I made a script called `get_data.sh` that will download the data and put it in a folder.
+You can run it with the following command.
+
+```
+chmod +x get_data.sh
+./get_data.sh
+```

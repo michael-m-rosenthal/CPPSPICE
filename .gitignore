@@ -38,3 +38,5 @@ cspice/exe/**
 
 bin/**
 build/**
+doc/**
+data/**

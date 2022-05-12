@@ -194,7 +194,7 @@ So if you want times of solar occultations in the period 2030 JAN 01 to 2040 JAN
 
 ## Installing occfind command line interface locally without root by using environment variables
 
-You can make the occfind command accessible upon startup be adding the following lines to your `~/.bashrc` file.
+You can make the occfind command accessible upon startup by adding the following lines to your `~/.bashrc` file.
 
 ```
 export SPICEDIR="/path/to/spice/directory"

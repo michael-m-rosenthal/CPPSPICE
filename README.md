@@ -71,7 +71,7 @@ Alternatively, you can just download the files from the [NAIF website](https://n
 
 ## Download CSPICE from NAIF
 
-I have already included `cspice` in this repository
+I have already included `cspice` in this repository.
 In retrospect, I probably should have git ignored this entire directory.
 I made a script called `download_and_unzip_linux_64_cspice.sh` that will download and unzip CSPICE.
 You can run the script with the following command.
@@ -98,21 +98,7 @@ chmod +x makeall.csh
 ./makeall.csh
 ```
 
-## A Dockerfile for testing code
-
-I have also included make a Dockerfile that will create a testing environment that can be used for automated testing later.
-I will not have time to go into much detail with that for this coding assignment, but I will mention that docker images like this are commonly used for CI/CD DEVOPS using Jenkins or Gitlab runners.
-
-https://docs.docker.com/engine/install/ubuntu/
-
-I like to keep my dockerfiles shallow (calling other scripts) so that the build scripts that I use to create the docker image are exactly available for someone who wants to build the environment on the host system.
-Also, if the script needs to change, I find that I am far more likely to miss something if I need to change the scripts in multiple files.
-This does have some drawbacks because if the build fails at a script, the entire script will need to be ran again.
-I have found that the benefits outweigh the drawbacks on the projects that I have worked on.
-
-My main reason for doing the dockerfile in this project is so that I can test the scripts and commands I have documented for setting up the dev environment using a system without the dev tools already installed.
-
-### Descriptions of cpp files I had before starting
+## Descriptions of cpp files I had before starting
 
 Before I started this project, I had some c and c++ code that I wrote to help me understand the CSPICE toolkit.
 I do not want to go into much detail about them because it is not really part of the assignment.
@@ -120,7 +106,7 @@ Rather than deleting them, I put it in the `pre_src` directory.
 You can think of it as a scrap bin of code that I normally would not have included in the repository.
 I have since added some other scrap c/c++ code here.
 
-### Description of Data
+## Description of Data
 
 To compute the occultation times, I will need to load an appropriate leap second kernel, an appropriate SPK to get the ephemeris state and positions of the planets, and a pck to get the planetary constants.
 The generic kernels can be downloaded manually [here](https://naif.jpl.nasa.gov/naif/data_generic.html).
@@ -156,10 +142,90 @@ I am pretty sure I do not need the binary planetary constants for this calculati
 I see `pck00008.tpc` listed in the old_version directory and it looks like `pck00010.tpc` is the latest version.
 I am going to presume that I need `pck00010.tpc`.
 
-I made a script called `get_data.sh` that will download the data and put it in a folder.
+I made a script called `get_spice_data.sh` that will download the data and put it in a folder.
 You can run it with the following command.
 
 ```
-chmod +x get_data.sh
-./get_data.sh
+chmod +x get_spice_data.sh
+./get_spice_data.sh
+```
+
+I also made a script to get the old spice data.
+You can run it with the following command.
+
+```
+chmod +x get_spice_data.sh
+./get_oldspice_data.sh
+```
+
+## Building the occfind program
+
+I made a bash script called `build_cpp.sh` that will build `./bin/occfind` binary.
+You can run from the same directory as this `README.md` file with the following command.
+
+```
+chmod +x build_cpp.sh
+./build_cpp.sh
+```
+
+You should now have `./bin/occfind` compiled and ready to use.
+
+
+## Description of occfind CLI
+
+I made occfind into a command line interface with defaults that match the coding project inputs.
+There is are detailed help description inside the program itself.
+You can find that help description with the following command.
+
+```
+./bin/occfind --help
+```
+
+The default search path for the kernel files can be configured with environment variables.
+This is to make it easy to install and update the program's data.
+There are also various options to manually specify the kernel file locations, and to specify the search window.
+
+The default settings are configured to run the describe programming task as if the input variables where hard coded.
+So if you want times of solar occultations in the period 2030 JAN 01 to 2040 JAN 01, simply run the following command.
+
+```
+./bin/occfind
+```
+
+## A Dockerfile for testing code
+
+I have also included a Dockerfile that will create a testing environment that can be used for automated testing later.
+Docker images like this are commonly used for CI/CD DEVOPS using Jenkins or Gitlab runners.
+
+https://docs.docker.com/engine/install/ubuntu/
+
+I like to keep my dockerfiles shallow (calling other scripts) so that the build scripts that I use to create the docker image are exactly available for someone who wants to build the environment on the host system.
+Also, if the script needs to change, I find that I am far more likely to miss something if I need to change the scripts in multiple files.
+This does have some drawbacks because if the build fails at a script, the entire script will need to be ran again.
+I have found that the benefits outweigh the drawbacks on the projects that I have worked on.
+
+My main reason for doing the dockerfile in this project is so that I can test the scripts and commands I have documented for setting up the dev environment using a system without the dev tools already installed.
+
+The docker image can be built with the following command.
+
+```
+sudo docker build -t spice/occfind:latest .
+```
+
+Once the docker image has been built, an interactive terminal can be ran with the following command
+
+```
+sudo docker run -it --rm spice/occfind:latest bash
+```
+
+The actual cli command can also be ran with the following command.
+
+```
+sudo docker run -it --rm spice/occfind:latest ./bin/occfind
+```
+
+You can also pass in whatever optional arguments are supported by the cli.
+
+```
+sudo docker run -it --rm spice/occfind:latest ./bin/occfind --help
 ```

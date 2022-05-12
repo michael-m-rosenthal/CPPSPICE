@@ -192,6 +192,21 @@ So if you want times of solar occultations in the period 2030 JAN 01 to 2040 JAN
 ./bin/occfind
 ```
 
+## Installing occfind command line interface locally without root by using environment variables
+
+You can make the occfind command accessible upon startup be adding the following lines to your `~/.bashrc` file.
+
+```
+export SPICEDIR="/path/to/spice/directory"
+export PATH="$SPICEDIR/bin:$PATH"
+export OCCFIND_DATA_PATH="$SPICEDIR/data"
+export OCCFIND_LSK_BASENAME="naif0012.tls"
+export OCCFIND_SPK_BASENAME="de430.bsp"
+export OCCFIND_PCK_BASENAME="pck00010.tpc"
+```
+
+Replace `/path/to/spice/directory` with the absolute path to this directory.
+
 ## A Dockerfile for testing code
 
 I have also included a Dockerfile that will create a testing environment that can be used for automated testing later.
@@ -224,8 +239,113 @@ The actual cli command can also be ran with the following command.
 sudo docker run -it --rm spice/occfind:latest ./bin/occfind
 ```
 
-You can also pass in whatever optional arguments are supported by the cli.
+You can also pass in whatever optional arguments are supported by the CLI.
 
 ```
 sudo docker run -it --rm spice/occfind:latest ./bin/occfind --help
+```
+
+## A quick test
+
+Normally, I would have a set of test that I would run, but that is the part that takes to longest time.
+I am going to settle with a less formal test for this project.
+
+This project has brought back some great personal memories for me.
+
+There was a total eclipse in North America on August 21, 2017.
+My wife and I decided to settle for seeing a partial eclipse at home because we had a small child and the hotels were booked up everywhere.
+We picked up a some special eye protection from the local library and made a viewer out of a cardboard box for our daughter to look through.
+It was overcast in Panama City Beach, FL on that day.
+My wife and I looked at the radar and noticed that we might be able to make it in time to a clear spot just north of I-10.
+We buckled up our one year old daughter and drove north on highway 79 praying for a break in the clouds.
+We pulled over to a gas station and viewed a partial eclipse from there.
+I remember that the sun was high in the sky, so I imagine that the time was around noon.
+
+A trucker noticed us looking at the eclipse and decided to pull over to see it.
+He had a brown beer bottle that he was trying to view the eclipse from.
+I explained to him that he needed special eye protection to view it and we shared our protective glasses with him so that he could see it without ruining his eyesight.
+We also shared our cardboard viewer so that he could see it through the viewer as well.
+
+Will my occfind program which leverages cspice's geometry finder be able to tell me the correct time?
+
+To find out, type the following command:
+
+```
+./bin/occfind -b "2017 AUG 21" -e "2017 AUG 22"
+```
+
+```
+The output is
+
+Loading Kernel ./data/naif0012.tls
+Loading Kernel ./data/de430.bsp
+Loading Kernel ./data/pck00010.tpc
+Searching for Occultations
+Start Time (UTC):
+	AUG 21,2017  00:00:00.0000
+END Time (UTC):
+	AUG 22,2017  00:00:00.0000
+
+Results (UTC):
+	AUG 21,2017  17:51:03.1466 - AUG 21,2017  19:00:00.4608
+```
+
+17:51:03.1466 UTC is 2017/08/22 01:50 PM, so that seems to be accurate with respect to what I recall.
+
+## Result
+
+```
+Loading Kernel ./data/naif0012.tls
+Loading Kernel ./data/de430.bsp
+Loading Kernel ./data/pck00010.tpc
+Searching for Occultations
+Start Time (UTC):
+	JAN 01,2030  00:00:00.0000
+END Time (UTC):
+	JAN 01,2040  00:00:00.0000
+
+Results (UTC):
+	JUN 01,2030  06:20:42.2582 - JUN 01,2030  06:35:24.6961
+	NOV 25,2030  06:11:49.7772 - NOV 25,2030  07:29:05.1794
+	MAY 21,2031  06:13:30.7355 - MAY 21,2031  08:16:20.8072
+	NOV 14,2031  20:17:38.8633 - NOV 14,2031  21:55:02.5773
+	MAR 20,2034  09:30:15.1732 - MAR 20,2034  11:04:55.8497
+	SEP 12,2034  15:33:19.5171 - SEP 12,2034  17:03:18.9084
+	MAR 09,2035  22:27:30.3650 - MAR 09,2035  23:41:56.6301
+	SEP 02,2035  01:13:32.4942 - SEP 02,2035  02:37:43.2673
+	JAN 05,2038  13:04:43.6032 - JAN 05,2038  14:27:21.6770
+	JUL 02,2038  12:29:29.0582 - JUL 02,2038  14:34:00.7796
+	DEC 26,2038  00:10:36.2953 - DEC 26,2038  01:47:25.7879
+```
+
+There is a list occultation listed [here](https://en.wikipedia.org/wiki/List_of_solar_eclipses_in_the_21st_century).
+
+There are some times that are missing,
+
+- May 9, 2032
+- November 3, 2032
+- March 30, 2033
+- September 23, 2033
+- February 27, 2036
+- July 23, 2036
+- August 21, 2036
+- January 16, 2037
+- July 13, 2037
+- June 21, 2039
+- December 15, 2039
+
+But in the cases above no shadow would be cast where the Earth's center is.
+
+
+## More Stuff
+
+Assuming that the observer is in the center of the Earth was bothering me, so I made some changes to make it so that I could load ephemeris data for an earth station.
+I figured out that to set DSS-14 as the observer, I need to load
+`data/earth_200101_990628_predict.bpc` and `earthstns_itrf93_201023.bsp`.
+
+Then I made some additional option in the cli so that I could pass that in.
+The following command will compute occulations with DSS-14 as the observer.
+
+```
+./bin/occfind --set-observer "DSS-14" --extra-kernels data/earth_200101_990628_predict.bpc data/earthstns_itrf93_201023.bsp
 ```

@@ -71,59 +71,88 @@ int main(int argc, char *argv[]){
   std::string startDateTime="2030 JAN 01";
   std::string endDateTime="2040 JAN 01";
 
+  //
+  std::string observer="EARTH";
   // input default cspice search bin interval
   double timeStepSize=180.0; // 3 minutes
+
+  std::vector<std::string> extraKernels;
 
   //////////////////////////////////////////////////////////////////////////////
   // Read CLI arguments and modify default inputs
   for ( int ii = 0; ii < argc; ii++ )
   {
     std::string currentArgument = argv[ii];// convert to c++ string so that I can use c++ string comparison
-    if ((currentArgument=="--help") | (currentArgument=="-h"))
+    if ((currentArgument == "--help") | (currentArgument=="-h"))
     {
       spice::PrintHelp();
       return 0;
     }
-    if ((currentArgument=="--lsk") | (currentArgument=="-l"))
+    if ((currentArgument == "--lsk") | (currentArgument=="-l"))
     {
       ii +=1;
       FilenameLSK=argv[ii];
     }
-    if ((currentArgument=="--spk") | (currentArgument=="-s"))
+    if ((currentArgument == "--spk") | (currentArgument=="-s"))
     {
       ii +=1;
       FilenameSPK=argv[ii];
     }
-    if ((currentArgument=="--pck") | (currentArgument=="-p"))
+    if ((currentArgument == "--pck") | (currentArgument=="-p"))
     {
       ii +=1;
       FilenamePCK=argv[ii];
     }
-    if ((currentArgument=="--begin") | (currentArgument=="-b"))
+    if ((currentArgument =="--begin") | (currentArgument=="-b"))
     {
       ii +=1;
-      startDateTime=argv[ii];
+      startDateTime = argv[ii];
     }
-    if ((currentArgument=="--end") | (currentArgument=="-e"))
+    if ((currentArgument =="--end") | (currentArgument=="-e"))
     {
       ii +=1;
-      endDateTime=argv[ii];
+      endDateTime = argv[ii];
     }
-    if ((currentArgument=="--step"))
+    if ((currentArgument == "--step"))
     {
       ii +=1;
-      timeStepSize=std::atof(argv[ii]);
+      timeStepSize = std::atof(argv[ii]);
+    }
+    if ((currentArgument == "--set-observer"))
+    {
+      ii +=1;
+      observer = argv[ii];
+    }
+    if ((currentArgument == "--extra-kernels"))
+    {
+      do // assume the remaining inputs are kernel file paths
+      {
+        ii +=1;
+        std::string kernel = argv[ii];
+        extraKernels.push_back(kernel);
+      }
+      while (ii < argc-1);// last argv is always a null pointer
+
     }
   }
-
+  //occultations.LoadKernel("./data/earthstns_itrf93_201023.bsp");
+  //occultations.LoadKernel("./data/earth_200101_990628_predict.bpc");
   //////////////////////////////////////////////////////////////////////////////
   // Initialize object and run the computation
   // load kernels
   spice::Occultations occultations(FilenameLSK,FilenameSPK,FilenamePCK);
+  // load extra kernels
+  for ( int ii = 0; ii < extraKernels.size() ; ii++){
+    occultations.LoadKernel(extraKernels[ii]);
+  }
+  // set observer
+  occultations.SetObserver(observer);
   // set search window
   occultations.SetTimeWindow(startDateTime,endDateTime);
   // set the step size
   occultations.SetTimeStepSize(timeStepSize);
+
+
   // Run the Search
   occultations.ComputeOccultations();
   // Print the Results

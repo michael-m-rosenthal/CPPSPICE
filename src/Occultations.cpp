@@ -11,14 +11,11 @@ spice::Occultations::Occultations(std::string filenameLSK, std::string filenameS
   std::string filenamePCK )
 {
   // load the leap second kernel
-  std::cout << "Loading Kernel " << filenameLSK << std::endl;
-  furnsh_c( filenameLSK.c_str() );
-  std::cout << "Loading Kernel " << filenameSPK << std::endl;
+  LoadKernel(filenameLSK);
   // load the ephemeris data
-  furnsh_c( filenameSPK.c_str() );
+  LoadKernel(filenameSPK);
   // load the planetary constants data
-  std::cout << "Loading Kernel " << filenamePCK << std::endl;
-  furnsh_c( filenamePCK.c_str() );
+  LoadKernel(filenamePCK);
   // set the default TimeStepSize to 3 minute intervals
   SetTimeStepSize( 180.0);
   m_timeBin=3153600000.0; // about one hundred years years
@@ -181,4 +178,16 @@ void spice::Occultations::PrintTimes()
   }
 
 
+}
+
+void spice::Occultations::LoadKernel(std::string filename)
+{
+  std::cout << "Loading Kernel " << filename << std::endl;
+  furnsh_c( filename.c_str() );
+}
+
+void spice::Occultations::SetObserver(std::string observer)
+{
+  std::cout << "Observer: " << observer << std::endl;
+  m_observer=observer;
 }

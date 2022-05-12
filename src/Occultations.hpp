@@ -96,6 +96,16 @@ namespace spice
       *
       */
       void PrintTimes();
+
+      /**
+      * \brief load additional kernels
+      */
+      void LoadKernel(std::string filename);
+
+      /**
+      * \brief set the observer
+      */
+      void SetObserver(std::string observer);
   };
 }
 #endif  // OCCULTATIONS_H_

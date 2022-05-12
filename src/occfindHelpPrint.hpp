@@ -88,6 +88,25 @@ namespace spice
     std::cout << "[DEFAULT] 180.0";
     std::cout   << std::endl;
     ////////////////////////////////////////////////////////////////////////////
+    std::cout << "\t";
+    std::cout << "--set-observer ";
+    std::cout << "\n\t\t";
+    std::cout << "Choose another observer such as MARS or DSS-14";
+    std::cout << "\n\n\t\t";
+    std::cout << "[DEFAULT] EARTH";
+    std::cout   << std::endl;
+    ////////////////////////////////////////////////////////////////////////////
+    std::cout << "\t";
+    std::cout << "--extra-kernels ";
+    std::cout << "\n\t\t";
+    std::cout << "Load extra kernels needed for the observer";
+    std::cout << "\n\t\t";
+    std::cout << "You can specify more than one file, but do not try to add any other argument after this or you will get and error.";
+    std::cout << "After you use the --extra-kernels option, all other arguments must be paths to kernels";
+    std::cout << "\n\n\t\t";
+    std::cout << "[DEFAULT] ";
+    std::cout   << std::endl;
+    ////////////////////////////////////////////////////////////////////////////
     std::cout << lineBorder << std::endl;
     std::cout << "Configuration Environment Variables:  "<< std::endl;
     ////////////////////////////////////////////////////////////////////////////
@@ -149,6 +168,12 @@ namespace spice
     std::cout << "This will allow you to manually load alternative kernels";
     std::cout << std::endl;
     ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    std::cout << "\n\n\tExample Usage: \n\t";
+    std::cout << "./bin/occfind --set-observer \"DSS-14\" --extra-kernels data/earth_200101_990628_predict.bpc data/earthstns_itrf93_201023.bsp "<< std::endl;
+    std::cout << "\n\t\t";
+    std::cout << "This will compute occultations with respect to Earth Station DSS-14";
+    std::cout << std::endl;
     std::cout << lineBorder << std::endl;
   }
 }

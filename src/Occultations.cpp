@@ -1,3 +1,7 @@
+/**
+// SPICE2 Version 0.0.0, 10-May-2022 (MMR)
+*/
+
 #include "Occultations.hpp"
 #include <iostream>
 #include <cassert>
@@ -7,10 +11,13 @@ spice::Occultations::Occultations(std::string filenameLSK, std::string filenameS
   std::string filenamePCK )
 {
   // load the leap second kernel
+  std::cout << "Loading Kernel " << filenameLSK << std::endl;
   furnsh_c( filenameLSK.c_str() );
+  std::cout << "Loading Kernel " << filenameSPK << std::endl;
   // load the ephemeris data
   furnsh_c( filenameSPK.c_str() );
   // load the planetary constants data
+  std::cout << "Loading Kernel " << filenamePCK << std::endl;
   furnsh_c( filenamePCK.c_str() );
   // set the default TimeStepSize to 3 minute intervals
   SetTimeStepSize( 180.0);
@@ -26,6 +33,13 @@ spice::Occultations::Occultations(std::string filenameLSK, std::string filenameS
   m_observer="EARTH";
 }
 
+spice::Occultations::~Occultations(){
+  /*
+  Clear the KEEPER subsystem: unload all kernels, clear the kernel
+  pool, and re-initialize the subsystem. Existing watches on kernel
+  variables are retained.*/
+  kclear_c();
+}
 
 void spice::Occultations::SetTimeWindow( std::string startDateTimel, std::string endDateTime )
 {
@@ -45,8 +59,6 @@ void spice::Occultations::SetTimeWindow( std::string startDateTimel, std::string
     // we do not need to bin up the time interval
     m_epemerisTimeSearchWindowEnd=m_desiredEpemerisTimeSearchWindowEnd;
   }
-
-
 }
 
 
@@ -62,7 +74,6 @@ int spice::Occultations::ComputeNextOccultation(){
   SPICEDOUBLE_CELL      ( dvswin, MAXIMUM_WINDOWS );
   SPICEDOUBLE_CELL      ( result, MAXIMUM_WINDOWS );
   wninsd_c ( m_epemerisTimeSearchWindowStart, m_epemerisTimeSearchWindowEnd, &cnfine );
-
 
   // run the spice geometry finder
   gfoclt_c ( m_occultationType.c_str(),
@@ -90,8 +101,6 @@ int spice::Occultations::ComputeNextOccultation(){
   }
   else
   {
-
-
     /*
     Because I bin up the time interval, I need to make sure it isn't binned in the middle of a lunar eclipse.
     To accomplish this I will compare the end of the previous interval to the start of this current interval
@@ -147,14 +156,16 @@ void spice::Occultations::ComputeOccultations(){
     timout_c ( m_epemerisTimeSearchWindowEnd, m_timeFormat.c_str(), m_NUMBER_OF_DATE_CHARACTERS, finishUTC);
 
     // print out search band
-    std::cout << "Searching for Occultations between " <<startUTC << " and " << finishUTC << std::endl;
+    std::cout << "Searching for Occultations" << std::endl;
+    std::cout << "Start Time (UTC):\n\t" << startUTC << std::endl;
+    std::cout << "END Time (UTC):\n\t" << finishUTC << std::endl<< std::endl;
   } while ( ComputeNextOccultation() ==1 );
 }
 
 void spice::Occultations::PrintTimes()
 {
 
-  std::cout << "\n\nResults:" << std::endl;
+  std::cout << "Results (UTC):" << std::endl;
 
   assert( m_resultStartTimeInterval.size() ==   m_resultEndTimeInterval.size() && " The size of the two time result vectors must be equal.");
   for ( int ii = 0; ii < m_resultStartTimeInterval.size(); ii++)
@@ -166,7 +177,7 @@ void spice::Occultations::PrintTimes()
     timout_c ( m_resultEndTimeInterval[ii], m_timeFormat.c_str(), m_NUMBER_OF_DATE_CHARACTERS, finishUTC);
 
     // print out the event
-    std::cout << startUTC << " - " << finishUTC << std::endl;
+    std::cout <<"\t"<< startUTC << " - " << finishUTC << std::endl;
   }
 
 

@@ -5,7 +5,7 @@ It Uses NAIF's C++11 "Coding Style and Standards" document (attached) and exampl
 
 ## Simplifying Assumption
 
-I am going to assume that the observer is located at the center of the Earth for the occultation calculation.
+Since I do not know where on Earth the observer is, I am going to assume that the observer is located at the center of the Earth and that the Earth somehow does not obstruct the observer from viewing the event for the occultation calculation.
 
 ## Approach
 
@@ -18,8 +18,6 @@ I am going to accomplish this task sequentially in the following steps:
 1) Read the coding style standard found in the `SPICE2_Coding_Style_and_Standards_2022-02-17.md` file
 1) Write a simple c program with hard coded inputs that uses the `SPICE Geometry Finder (GF) Subsystem`
 1) Write a C++ class that handles the memory management
-
-Along the way I will explain the progression of the code into it final form.
 
 ## Preliminaries
 
@@ -52,7 +50,7 @@ It is better just to archive the binaries using an artifact registry or a just c
 
 You may also wish to install a nice text editor like `atom`, but that is optional.
 I hear good things about `sublime` and `vscode` too.
-Personally, I like `vim`, `grep`, and `sed`.
+Personally, I like the idea of using `vim`, `grep`, and `sed`.
 On Ubuntu, you can install `atom` using snap with the following command.
 
 ```
@@ -83,7 +81,7 @@ chmod +x ./download_and_unzip_linux_64_cspice.sh
 ./download_and_unzip_linux_64_cspice.sh
 ```
 
-You can also just install it from the NAIF site [here](https://naif.jpl.nasa.gov/naif/toolkit_C_PC_Linux_GCC_64bit.html)
+You can also just download it from the NAIF site [here](https://naif.jpl.nasa.gov/naif/toolkit_C_PC_Linux_GCC_64bit.html)
 
 
 ### Build CSPICE
@@ -109,7 +107,7 @@ https://docs.docker.com/engine/install/ubuntu/
 
 I like to keep my dockerfiles shallow (calling other scripts) so that the build scripts that I use to create the docker image are exactly available for someone who wants to build the environment on the host system.
 Also, if the script needs to change, I find that I am far more likely to miss something if I need to change the scripts in multiple files.
-This does have a drawback because if the build fails at a script, the entire script will need to be ran again.
+This does have some drawbacks because if the build fails at a script, the entire script will need to be ran again.
 I have found that the benefits outweigh the drawbacks on the projects that I have worked on.
 
 My main reason for doing the dockerfile in this project is so that I can test the scripts and commands I have documented for setting up the dev environment using a system without the dev tools already installed.
@@ -117,14 +115,14 @@ My main reason for doing the dockerfile in this project is so that I can test th
 ### Descriptions of cpp files I had before starting
 
 Before I started this project, I had some c and c++ code that I wrote to help me understand the CSPICE toolkit.
-I do not want to go into much detail about them because I am going to do a much more thorough job explaining everything related to this coding project.
+I do not want to go into much detail about them because it is not really part of the assignment.
 Rather than deleting them, I put it in the `pre_src` directory.
 You can think of it as a scrap bin of code that I normally would not have included in the repository.
 I have since added some other scrap c/c++ code here.
 
 ### Description of Data
 
-To compute the occultation times, I will need to load an appropriate leap second kernel, an appropriate SPK to get the emphirise state and positions of the planets, and a pck to get the planetary constants
+To compute the occultation times, I will need to load an appropriate leap second kernel, an appropriate SPK to get the ephemeris state and positions of the planets, and a pck to get the planetary constants.
 The generic kernels can be downloaded manually [here](https://naif.jpl.nasa.gov/naif/data_generic.html).
 
 The following kernels are loaded in the `gfoclt_c` example found [here](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/info/mostused.html#3)
@@ -165,9 +163,3 @@ You can run it with the following command.
 chmod +x get_data.sh
 ./get_data.sh
 ```
-
-This is what I will do, I am going to make it break it up into small peices.
-I've read that there can be between 2 and 5 solar eclipses per year.
-Let's just say 5.
-If I make the results cell size 200, and I need 4 for each interval, that is roughly 10 years.
-I will bin up the interval into ten year increments then.

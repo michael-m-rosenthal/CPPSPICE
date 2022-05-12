@@ -18,25 +18,28 @@ namespace spice
   class Occultations
   {
     private:
-      SpiceDouble m_timeStepSize;/**< \brief seconds binning up the occultation search */
-      SpiceDouble m_epemerisTimeSearchWindowStart;
-      SpiceDouble m_epemerisTimeSearchWindowEnd;
-      SpiceDouble m_desiredEpemerisTimeSearchWindowEnd;
-      SpiceDouble m_timeBin;
-
-      std::string m_timeFormat;
-      std::string m_occultationType;
-      std::string m_front;
-      std::string m_back;
-      std::string m_observer;
+      // Primary inputs
+      SpiceDouble m_epemerisTimeSearchWindowStart;/**< \brief current start time window in et */
+      SpiceDouble m_epemerisTimeSearchWindowEnd; /**< \brief current end time window in et */
+      SpiceDouble m_desiredEpemerisTimeSearchWindowEnd; /**< \brief goal end time window in et */
+      // configuration inputs
+      SpiceDouble m_timeBin;  /**< \brief how are you going to break up the total interval? */
+      std::string m_timeFormat;  /**< \brief a string that tells cspice how to translate ET to a date string */
+      std::string m_occultationType; /**< \brief occtyp input for gfoclt_c */
+      std::string m_front; /**< \brief front input for gfoclt_c */
+      std::string m_back; /**< \brief back input for gfoclt_c */
+      std::string m_observer; /**< \brief obsrvr input for gfoclt_c */
+      SpiceDouble m_timeStepSize;
+      /**< \brief step input for gfoclt_c
+      *
+      * Seconds binning up the occultation search.
+      */
       // main output
-      std::vector<SpiceDouble> m_resultStartTimeInterval;
-      std::vector<SpiceDouble> m_resultEndTimeInterval;
-
-      //
+      std::vector<SpiceDouble> m_resultStartTimeInterval; /**< \brief Stored ET Start times for occultation events*/
+      std::vector<SpiceDouble> m_resultEndTimeInterval;/**< \brief Stored ET end times for occultation events*/
+      // Static Memory Parameters
       const int m_NUMBER_OF_DATE_CHARACTERS=51;
-
-      //
+      // Auxilary Parameters
       SpiceDouble m_lastResult;/**< \brief keep track of this so I can tell if I break in the middle of a solar eclipse */
     public:
       /**
@@ -49,6 +52,10 @@ namespace spice
               std::string filenameSPK,  /**< \brief file path for the planetary ephemeris data kernel*/
               std::string filenamePCK   /**< \brief file path for the planetary constant data kernel*/
             );
+      /**
+      * \brief I think that the only thing that needs specified to clear is the cspice kernel pool
+      */
+      ~Occultations();
       /**
       * \brief initialize the occultation calculation class
       *
@@ -65,6 +72,9 @@ namespace spice
         m_timeStepSize=timeStepSize;
       }
 
+      /**
+      * \brief This will clear the m_resultStartTimeInterval and m_resultEndTimeInterval
+      */
       void ClearResults();
 
       /**
@@ -81,6 +91,10 @@ namespace spice
       */
       void ComputeOccultations();
 
+      /**
+      * \brief Prints out a list of time intervals results in UTC time
+      *
+      */
       void PrintTimes();
   };
 }

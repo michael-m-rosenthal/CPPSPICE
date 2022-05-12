@@ -3,6 +3,10 @@
 The objective of the code in this repository is to write a C++ program that determines times of solar occultations (the moon blocks the sun as seen from earth) in the period 2030 JAN 01 to 2040 JAN 01.
 It Uses NAIF's C++11 "Coding Style and Standards" document (attached) and examples of NAIF's existing CSPICE routines as guides.
 
+## Simplifying Assumption
+
+I am going to assume that the observer is located at the center of the Earth for the occultation calculation.
+
 ## Approach
 
 I will link the static libraries that cspice compiles and call them within c++ code.
@@ -13,7 +17,6 @@ I am going to accomplish this task sequentially in the following steps:
 
 1) Read the coding style standard found in the `SPICE2_Coding_Style_and_Standards_2022-02-17.md` file
 1) Write a simple c program with hard coded inputs that uses the `SPICE Geometry Finder (GF) Subsystem`
-1) Write a C++ program that deals the dynamic memory allocation
 1) Write a C++ class that handles the memory management
 
 Along the way I will explain the progression of the code into it final form.
@@ -44,16 +47,28 @@ mkdir cspice/exe
 These directories do not get pushed to the repository because I git ignore them so that I do not accidentally tell git to keep track of changes made to compiled binaries.
 The build directory will contain the shared objects that I create with my c++ code.
 The bin directory will contain the API and other binaries compiled from my c++ code.
-I do not track changes with these files with git because it makes the repository big when you track things like that, and it is better just to archive the binaries using an artifact registry or a just collection of compressed files.
+I do not track changes to these files with git because it makes the repository big when you track things like that.
+It is better just to archive the binaries using an artifact registry or a just collection of compressed files.
 
 You may also wish to install a nice text editor like `atom`, but that is optional.
 I hear good things about `sublime` and `vscode` too.
-Personally, I like `vim` and `grep`.
-You can install `atom` using snap with the following command.
+Personally, I like `vim`, `grep`, and `sed`.
+On Ubuntu, you can install `atom` using snap with the following command.
 
 ```
 sudo snap install atom --classic
 ```
+
+I have a few scripts that will download `cspice` and some of the kernels needed for the program.
+These scripts requires `wget`.
+If you want to use my scripts, you will need to have `wget` installed.
+If you do not already have `wget`, you can install it with the following line of code.
+
+```
+sudo apt-get install wget
+```
+
+Alternatively, you can just download the files from the [NAIF website](https://naif.jpl.nasa.gov/naif/).
 
 
 ## Download CSPICE from NAIF
@@ -61,13 +76,6 @@ sudo snap install atom --classic
 I have already included `cspice` in this repository
 In retrospect, I probably should have git ignored this entire directory.
 I made a script called `download_and_unzip_linux_64_cspice.sh` that will download and unzip CSPICE.
-The script requires `wget`.
-If you do not already have wget, you can install it with the following line of code with root or sudo privledges.
-
-```
-apt-get install wget
-```
-
 You can run the script with the following command.
 
 ```
@@ -80,7 +88,7 @@ You can also just install it from the NAIF site [here](https://naif.jpl.nasa.gov
 
 ### Build CSPICE
 
-We will need to build the cspice static libraries from before we can link them.
+We will need to build the cspice static libraries before we can link them.
 To do that you will need c-shell and the build essentials installed as I mentioned earlier.
 If you have c-shell and gcc installed, then you should be able to the run the `./makall.csh` script from within the `cspice` directory after you give it execute permission.
 
@@ -100,34 +108,34 @@ I will not have time to go into much detail with that for this coding assignment
 https://docs.docker.com/engine/install/ubuntu/
 
 I like to keep my dockerfiles shallow (calling other scripts) so that the build scripts that I use to create the docker image are exactly available for someone who wants to build the environment on the host system.
-Also, if the script needs to change, I find that I am far more likely to miss something if I need to change the script in multiple places.
+Also, if the script needs to change, I find that I am far more likely to miss something if I need to change the scripts in multiple files.
 This does have a drawback because if the build fails at a script, the entire script will need to be ran again.
 I have found that the benefits outweigh the drawbacks on the projects that I have worked on.
 
-My main reason for doing the dockerfile is so that I can test the scripts and commands I have documented for setting up the dev environment using a system without the dev tools already installed.
-
+My main reason for doing the dockerfile in this project is so that I can test the scripts and commands I have documented for setting up the dev environment using a system without the dev tools already installed.
 
 ### Descriptions of cpp files I had before starting
 
 Before I started this project, I had some c and c++ code that I wrote to help me understand the CSPICE toolkit.
 I do not want to go into much detail about them because I am going to do a much more thorough job explaining everything related to this coding project.
 Rather than deleting them, I put it in the `pre_src` directory.
-If you are interested, you can `cd` into the `pre_src`directory and build the shared object libraries and binaries using the `mkcppprodct.csh`.
-
+You can think of it as a scrap bin of code that I normally would not have included in the repository.
+I have since added some other scrap c/c++ code here.
 
 ### Description of Data
 
+To compute the occultation times, I will need to load an appropriate leap second kernel, an appropriate SPK to get the emphirise state and positions of the planets, and a pck to get the planetary constants
+The generic kernels can be downloaded manually [here](https://naif.jpl.nasa.gov/naif/data_generic.html).
 
 The following kernels are loaded in the `gfoclt_c` example found [here](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/info/mostused.html#3)
+
 ```
 furnsh_c( "naif0008.tls"  );
 furnsh_c( "de421.bsp"     );
 furnsh_c( "pck00008.tpc"  );
 ```
 
-I need a lsk, a spk and a pck to use `gfoclt_c`.
-
-The generic kernels can be downloaded manually [here](https://naif.jpl.nasa.gov/naif/data_generic.html).
+These do not appear to be the latest versions of the data kernels.
 
 At the time I am writing this, the [aareadme.txt](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/aareadme.txt) says that `naif0012.tls` is the latest leap second kernel.
 
@@ -157,3 +165,9 @@ You can run it with the following command.
 chmod +x get_data.sh
 ./get_data.sh
 ```
+
+This is what I will do, I am going to make it break it up into small peices.
+I've read that there can be between 2 and 5 solar eclipses per year.
+Let's just say 5.
+If I make the results cell size 200, and I need 4 for each interval, that is roughly 10 years.
+I will bin up the interval into ten year increments then.

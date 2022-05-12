@@ -17,7 +17,7 @@ int main (){
   /*
   Format string for time output:
   */
-  #define TDBFMT          "YYYY MON DD HR:MN:SC.### TDB ::TDB"
+  #define TFMT          "MON DD,YYYY  HR:MN:SC.####  ::UTC"
   SPICEDOUBLE_CELL      ( cnfine, MAXWIN );
   SPICEDOUBLE_CELL      ( result, MAXWIN );
   SPICEDOUBLE_CELL      ( dvswin, MAXWIN );
@@ -46,8 +46,8 @@ int main (){
   /*
      Store the time bounds in the confinement window.
   */
-  str2et_c ( "2001 DEC 01", &et0 );
-  str2et_c ( "2002 JAN 01", &et1 );
+  str2et_c ( "2017 AUG 20", &et0 );
+  str2et_c ( "2030 AUG 22", &et1 );
 
   wninsd_c ( et0, et1, &cnfine );
 
@@ -89,8 +89,8 @@ int main (){
                           */
                           wnfetd_c ( &result, i, &start, &finish );
 
-                          timout_c ( start,  TDBFMT, TIMLEN, begstr );// you need to be careful here about the time... I think it is wrong
-                          timout_c ( finish, TDBFMT, TIMLEN, endstr );
+                          timout_c ( start,  TFMT, TIMLEN, begstr );// you need to be careful here about the time... I think it is wrong
+                          timout_c ( finish, TFMT, TIMLEN, endstr );
 
                           printf ( "   %s   %s\n", begstr, endstr );
                        }

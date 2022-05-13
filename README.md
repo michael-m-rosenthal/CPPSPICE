@@ -199,13 +199,22 @@ You can make the occfind command accessible upon startup by adding the following
 ```
 export SPICEDIR="/path/to/spice/directory"
 export PATH="$SPICEDIR/bin:$PATH"
-export OCCFIND_DATA_PATH="$SPICEDIR/data"
+export OCCFIND_DATA_PATH="$SPICEDIR/data/"
 export OCCFIND_LSK_BASENAME="naif0012.tls"
 export OCCFIND_SPK_BASENAME="de430.bsp"
 export OCCFIND_PCK_BASENAME="pck00010.tpc"
 ```
 
+I have also made a script that you can call in the terminal to temporarily install it in the environment you are using.
+All you need to do is run the following command.
+
+```
+source ./initialize_occfinder.sh
+```
+
 Replace `/path/to/spice/directory` with the absolute path to this directory.
+
+
 
 ## A Dockerfile for testing code
 
@@ -340,12 +349,37 @@ But in the cases above no shadow would be cast where the Earth's center is.
 ## More Stuff
 
 Assuming that the observer is in the center of the Earth was bothering me, so I made some changes to make it so that I could load ephemeris data for an earth station.
-I figured out that to set DSS-14 as the observer, I need to load
+I figured out that to set DSS-14 as the observer, that I need to load
 `data/earth_200101_990628_predict.bpc` and `earthstns_itrf93_201023.bsp`.
 
-Then I made some additional option in the cli so that I could pass that in.
+Then I made some additional options in the CLI so that I could pass that in.
 The following command will compute occulations with DSS-14 as the observer.
 
 ```
 ./bin/occfind --set-observer "DSS-14" --extra-kernels data/earth_200101_990628_predict.bpc data/earthstns_itrf93_201023.bsp
+```
+
+The outputed result was
+
+```
+Loading Kernel ./data/naif0012.tls
+Loading Kernel ./data/de430.bsp
+Loading Kernel ./data/pck00010.tpc
+Loading Kernel data/earth_200101_990628_predict.bpc
+Loading Kernel data/earthstns_itrf93_201023.bsp
+Observer: DSS-14
+Searching for Occultations
+Start Time (UTC):
+	JAN 01,2030  00:00:00.0000
+END Time (UTC):
+	JAN 01,2040  00:00:00.0000
+
+Results (UTC):
+	JUN 01,2030  06:09:56.4747 - JUN 01,2030  07:35:20.2067
+	NOV 14,2031  21:10:28.4327 - NOV 14,2031  22:08:50.5115
+	MAR 30,2033  16:29:12.0038 - MAR 30,2033  18:25:07.6356
+	MAR 20,2034  09:22:39.5816 - MAR 20,2034  10:23:50.7405
+	SEP 02,2035  02:23:48.6839 - SEP 02,2035  03:28:11.4383
+	JAN 05,2038  11:30:33.0279 - JAN 05,2038  13:18:38.7113
+	JUN 21,2039  14:48:46.0807 - JUN 21,2039  16:41:56.0064
 ```

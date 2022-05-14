@@ -3,6 +3,7 @@
 */
 
 #include "Occultations.hpp"
+#include "SpiceUsr.h"
 #include <iostream>
 #include <cassert>
 #include <string>

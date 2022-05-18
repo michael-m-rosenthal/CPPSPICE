@@ -88,7 +88,7 @@ namespace spice
     std::cout << "\t";
     std::cout << "--set-observer ";
     std::cout << "\n\t\t";
-    std::cout << "Choose another observer such as MARS or DSS-14";
+    std::cout << "Choose another observer such as MARS";
     std::cout << "\n\n\t\t";
     std::cout << "[DEFAULT] EARTH";
     std::cout   << std::endl;
@@ -165,13 +165,6 @@ namespace spice
     std::cout << "This will allow you to manually load alternative kernels";
     std::cout << std::endl;
     ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    std::cout << "\n\n\tExample Usage: \n\t";
-    std::cout << "./bin/occfind2 --set-observer \"DSS-14\" --extra-kernels data/earth_200101_990628_predict.bpc data/earthstns_itrf93_201023.bsp "<< std::endl;
-    std::cout << "\n\t\t";
-    std::cout << "This will compute occultations with respect to Earth Station DSS-14";
-    std::cout << std::endl;
-    std::cout << lineBorder << std::endl;
   }
 }
 #endif  // OCCFINDHELPPRINT_H_

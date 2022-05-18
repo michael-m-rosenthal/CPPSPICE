@@ -1,23 +1,29 @@
-# An Documented Example Using cspice with C++
+# A Documented Example Using cspice with C++
 
 The objective of the code in this repository is to write a C++ program that determines times of solar occultations (the moon blocks the sun as seen from earth) in the period 2030 JAN 01 to 2040 JAN 01.
-It Uses NAIF's C++11 "Coding Style and Standards" document (attached) and examples of NAIF's existing CSPICE routines as guides.
 
 ## Simplifying Assumption
 
-Since I do not know where on Earth the observer is, I am going to assume that the observer is located at the center of the Earth and that the Earth somehow does not obstruct the observer from viewing the event for the occultation calculation.
+I provide two solutions and they each have their own simplifying assumptions.
+
+The first solution is obtained via the CSPICE geometry finder tool.
+This is implemented in the `occfind` program.
+That tool assumes that the observer is located at a single point such as the center of the Earth and that the Earth somehow does not obstruct the observer from viewing the event for the occultation calculation.
+As a result, it misses many events in which no shadow would be cast on the Earth's Center of Mass.
+It can also use known observation stations such as DSS-14.
+
+The second solution utilizes the `spkezr_c` CSPICE tool to compute the positions of the SUN and MOON relative to the Earth.
+It uses the `bodvrd_c` to obtain the latest CSPICE planetary constants in order to compute maximum radius of the object bodies.
+This is implemented in the `occfind2` program.
+The simplifying assumption that I makes is that the occultations occur when the moon's center of mass passes through a truncated cone between the Earth's center of mass and the Sun's center of mass.
+I assume a linear interpolation between the radius of the Earth and Sun, which may be an over simplification.
+The algorithm could be easily generalized to use piecewise linear interpolation if the cone radius and light trajectory are non-linear.
+It misses one small event where a shadow is cast near the south pole.
 
 ## Approach
 
-I will link the static libraries that cspice compiles and call them within c++ code.
-In particular, I anticipate that I will use the `SPICE Geometry Finder (GF) Subsystem` [found here](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/Tutorials/pdf/individual_docs/29_geometry_finder.pdf).
+I will link the static libraries that CSPICE compiles and call them within c++ code.
 To test my code, I will try it on a period of time in the past where I can look up historic solar occultations.
-
-I am going to accomplish this task sequentially in the following steps:
-
-1) Read the coding style standard found in the `SPICE2_Coding_Style_and_Standards_2022-02-17.md` file
-1) Write a simple c program with hard coded inputs that uses the `SPICE Geometry Finder (GF) Subsystem`
-1) Write a C++ class that handles the memory management
 
 ## Preliminaries
 
@@ -31,7 +37,6 @@ You can do so with the following command.
 chmod +x install_focal_preliminaries.sh
 sudo ./install_focal_preliminaries.sh
 ```
-
 
 You will also need to create some directories to store compiled shared objects, static libraries, and compiled binaries. If you open a terminal in the directory that this `README.md` file is located in, then you should be able to create the directories with the following command.
 
@@ -49,13 +54,14 @@ I do not track changes to these files with git because it makes the repository b
 It is better just to archive the binaries using an artifact registry or a just collection of compressed files.
 
 You may also wish to install a nice text editor like `atom`, but that is optional.
-I hear good things about `sublime` and `vscode` too.
-Personally, I like the idea of using `vim`, `grep`, and `sed`.
 On Ubuntu, you can install `atom` using snap with the following command.
 
 ```
 sudo snap install atom --classic
 ```
+
+I hear good things about `sublime` and `vscode` too.
+Personally, I like the idea of using `vim`, `grep`, and `sed`.
 
 I have a few scripts that will download `cspice` and some of the kernels needed for the program.
 These scripts requires `wget`.
@@ -65,9 +71,6 @@ If you do not already have `wget`, you can install it with the following line of
 ```
 sudo apt-get install wget
 ```
-
-Alternatively, you can just download the files from the [NAIF website](https://naif.jpl.nasa.gov/naif/).
-
 
 ## Download CSPICE from NAIF
 
@@ -160,7 +163,7 @@ chmod +x get_spice_data.sh
 
 ## Building the occfind program
 
-I made a bash script called `build_cpp.sh` that will build `./bin/occfind` binary.
+I made a bash script called `build_cpp.sh` that will build binaries called `./bin/occfind` and `./bin/occfind2`.
 You can run from the same directory as this `README.md` file with the following command.
 
 ```
@@ -168,17 +171,17 @@ chmod +x build_cpp.sh
 ./build_cpp.sh
 ```
 
-You should now have `./bin/occfind` compiled and ready to use.
+You should now have `./bin/occfind` and `./bin/occfind2` compiled and ready to use.
 
+## Description of occfind and occfind2 CLI
 
-## Description of occfind CLI
-
-I made occfind into a command line interface with defaults that match the coding project inputs.
+I made `occfind` and `occfind2` into command line interfaces with defaults that match the coding project inputs.
 There is are detailed help description inside the program itself.
 You can find that help description with the following command.
 
 ```
 ./bin/occfind --help
+./bin/occfind2 --help
 ```
 
 The default search path for the kernel files can be configured with environment variables.
@@ -186,13 +189,19 @@ This is to make it easy to install and update the program's data.
 There are also various options to manually specify the kernel file locations, and to specify the search window.
 
 The default settings are configured to run the describe programming task as if the input variables where hard coded.
-So if you want times of solar occultations in the period 2030 JAN 01 to 2040 JAN 01, simply run the following command.
+So if you want times of solar occultations in the period 2030 JAN 01 to 2040 JAN 01, simply run one of the following commands.
 
 ```
 ./bin/occfind
 ```
 
-## Installing occfind command line interface locally without root by using environment variables
+or
+
+```
+./bin/occfind2
+```
+
+## Installing occfind and occfind2 command line interfaces locally without root by using environment variables
 
 You can make the occfind command accessible upon startup by adding the following lines to your `~/.bashrc` file.
 
@@ -205,6 +214,8 @@ export OCCFIND_SPK_BASENAME="de430.bsp"
 export OCCFIND_PCK_BASENAME="pck00010.tpc"
 ```
 
+Be sure to replace `/path/to/spice/directory` with the absolute path to this directory.
+
 I have also made a script that you can call in the terminal to temporarily install it in the environment you are using.
 All you need to do is run the following command.
 
@@ -212,9 +223,11 @@ All you need to do is run the following command.
 source ./initialize_occfinder.sh
 ```
 
-Replace `/path/to/spice/directory` with the absolute path to this directory.
+If you have CPPSPICE located in your home directory, you could alternative put the following in your `.bashrc` file to locally install the tools.
 
-
+```
+source ~/CPPSPICE/initialize_occfinder.sh
+```
 
 ## A Dockerfile for testing code
 
@@ -301,7 +314,25 @@ Results (UTC):
 
 17:51:03.1466 UTC is 2017/08/22 01:50 PM, so that seems to be accurate with respect to what I recall.
 
-## Result
+A similar result is obtained using occfind2.
+
+
+```
+./bin/occfind2 -b "2017 AUG 21" -e "2017 AUG 22"
+```
+
+```
+The output is
+
+Loading Kernel ./data/naif0012.tls
+Loading Kernel ./data/de430.bsp
+Loading Kernel ./data/pck00010.tpc
+AUG 21,2017  16:03:00.0000 AUG 21,2017  20:48:00.0000
+```
+
+The time interval appears to closely agree with the times in which the moon is casting a shadow somewhere on the Earth.
+
+## Results for occfind
 
 ```
 Loading Kernel ./data/naif0012.tls
@@ -346,7 +377,7 @@ There are some times that are missing,
 But in the cases above no shadow would be cast where the Earth's center is.
 
 
-## More Stuff
+## Results for occfind at DSS-14
 
 Assuming that the observer is in the center of the Earth was bothering me, so I made some changes to make it so that I could load ephemeris data for an earth station.
 I figured out that to set DSS-14 as the observer, that I need to load

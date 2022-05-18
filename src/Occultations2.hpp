@@ -29,18 +29,18 @@ namespace spice
       // Auxilary variables
       SpiceDouble m_currentET; /* \brief the current time at which the algorithm is searching through */
       SpiceDouble m_stepSizeET; /* \brief the time stepsize used to search for events */
-      std::vector<double> m_toFront;/* \brief vector pointing toward the sun from the Earth */
-      std::vector<double> m_frontVelocity;/* \brief velocity of the sun with respect to Earth's center */
-      std::vector<double> m_toBack;/* \brief vector pointing to the moon from the center of the earth */
-      std::vector<double> m_backVelocity;/* \brief velocity of the moon with respect to the Earth's center */
-      std::vector<double> m_currentNormal;/* \brief unit direction toward the sun */
-      double m_halfMoonRevolution; /* \brief how much time can we safely fast-forward when the moon is behind the Earth with respec to the Sun?*/
+      std::vector<double> m_toFront;/* \brief vector pointing toward the back from the observer */
+      std::vector<double> m_frontVelocity;/* \brief velocity of the back with respect to observer's center */
+      std::vector<double> m_toBack;/* \brief vector pointing to the front from the center of the observer */
+      std::vector<double> m_backVelocity;/* \brief velocity of the front with respect to the observer's center */
+      std::vector<double> m_currentNormal;/* \brief unit direction toward the back */
+      double m_halfFrontRevolution; /* \brief how much time can we safely fast-forward when the front is behind the observer with respec to the back?*/
       // planetary constant parameter
-      double m_observerRadius; /* \brief the maximum radius of the Earth */
-      double m_frontRadius;/* \brief the maximum radius of the Sun*/
-      double m_backRadius;/* \brief the maximum radius of the Moon */
-      double m_radiusA;/* \brief the maximum radius of the Earth plus Moon */
-      double m_radiusB;/* \brief the maximum radius of the Sun plus Moon */
+      double m_observerRadius; /* \brief the maximum radius of the observer */
+      double m_frontRadius;/* \brief the maximum radius of the back*/
+      double m_backRadius;/* \brief the maximum radius of the front */
+      double m_radiusA;/* \brief the maximum radius of the observer plus front */
+      double m_radiusB;/* \brief the maximum radius of the back plus front */
       // output
       std::vector<double> resultET; /* \brief result times
       *
@@ -64,17 +64,37 @@ namespace spice
       /**
       * \brief load additional kernels
       */
-      void LoadKernel(std::string filename);
+      void LoadKernel( std::string filename );
+      /**
+      * \brief set the cspice observer object (default for the class is EARTH)
+      */
+      void SetObserver( std::string object );
+      /**
+      * \brief set the cspice front object (default for the class is MOON)
+      */
+      void SetFront( std::string object );
+      /**
+      * \brief set the cspice back object (default for the class is SUN)
+      */
+      void SetBack( std::string object) ;
+      /**
+      * \brief set  stepsize used to search for events (default for the class is 180 seconds)
+      */
+      void SetstepSizeET( double stepSizeET );
+      /**
+      * \brief set the frame used by cspise (default for the class is J2000)
+      */
+      void SetFrame( std::string frame );
       /**
       * \brief set the start and end time for the search
       */
       void SetTimeWindow( std::string startDateTime, std::string endDateTime );
       /**
-      * \brief A wrapper for getting the state of an object with respect to earth
+      * \brief A wrapper for getting the state of an object with respect to observer
       */
       void GetState( std::string target, std::string observer,  std::vector<double> &position, std::vector<double> &velocity  );
       /**
-      * \brief Computes the dot product between the sun and the moon vectors.
+      * \brief Computes the dot product between the back and the front vectors.
       */
       double CurrentFrontDotBack();
       /**

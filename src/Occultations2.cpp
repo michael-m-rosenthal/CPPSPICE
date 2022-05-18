@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <cmath>
+#include <algorithm>
 
 #include "SpiceUsr.h"
 #include "lowLevel.hpp"
@@ -21,14 +22,11 @@ spice::Occultations2::Occultations2( std::string filenameLSK , std::string filen
   LoadKernel( filenamePCK );
   //
   m_frame="J2000";
-  m_observer="Earth";
-  m_observerRadius=6378.0;
-  m_front="MOON";
-  m_frontRadius=1738.1;
-  m_back="SUN";
-  m_backRadius=696000.0;
+  SetObserver("Earth");
+  SetFront("MOON");
+  SetBack("SUN");
   m_stepSizeET=180.0;
-  m_halfMoonRevolution = 26.0*24.0*60.0*60.0/2.0; // slightly less than half the time it takes the moon to revolve around the earth.
+  m_halfFrontRevolution = 26.0*24.0*60.0*60.0/2.0; // slightly less than half the time it takes the front to revolve around the earth.
   // Set the default time string format
   m_timeFormat="MON DD,YYYY  HR:MN:SC.####  ::UTC";
   // truncated cone parameters
@@ -53,6 +51,39 @@ void spice::Occultations2::LoadKernel( std::string filename )
   furnsh_c( filename.c_str() );
 }
 
+void spice::Occultations2::SetObserver(std::string object){
+  std::vector<double> values(3);
+  SpiceInt dim;
+  bodvrd_c ( object.c_str(), "RADII", 3, &dim, &values[0] );
+  m_observer=object;
+  m_observerRadius = *std::max_element(values.begin(),values.end());
+}
+
+void spice::Occultations2::SetFront(std::string object){
+  std::vector<double> values(3);
+  SpiceInt dim;
+  bodvrd_c ( object.c_str(), "RADII", 3, &dim, &values[0] );
+  m_front=object;
+  m_frontRadius = *std::max_element(values.begin(),values.end());
+}
+
+void spice::Occultations2::SetBack(std::string object){
+  std::vector<double> values(3);
+  SpiceInt dim;
+  bodvrd_c ( object.c_str(), "RADII", 3, &dim, &values[0] );
+  m_back=object;
+  m_backRadius = *std::max_element(values.begin(),values.end());
+}
+
+void spice::Occultations2::SetstepSizeET( double stepSizeET )
+{
+  m_stepSizeET = stepSizeET;
+}
+
+void spice::Occultations2::SetFrame( std::string frame )
+{
+  m_frame = frame;
+}
 
 void spice::Occultations2::SetTimeWindow( std::string startDateTime, std::string endDateTime )
 {
@@ -97,7 +128,7 @@ void spice::Occultations2::RunSearch()
   int countConsecutiveWithinCone = 0;
   while ( m_currentET < m_endET ) {
     if ( CurrentFrontDotBack()> 0 ){
-      // the Moon is in front of the plane where it may pass in front of the Earth.
+      // the front is in front of the plane where it may pass in front of the observer.
       // now we need to make some additional computations.
 
       countConsecutiveNegativeDots = 0;
@@ -125,11 +156,11 @@ void spice::Occultations2::RunSearch()
     } else {
       if (countConsecutiveNegativeDots == 0){
         // make one big leap in time equal to about half a month
-        m_currentET += m_halfMoonRevolution;
+        m_currentET += m_halfFrontRevolution;
       }
       countConsecutiveNegativeDots ++;
     }
-    // check if the moon
+    // check if the front
     m_currentET += m_stepSizeET;
   }
 }

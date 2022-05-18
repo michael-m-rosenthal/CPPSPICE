@@ -418,6 +418,4 @@ DEC 15,2039  14:39:00.0004 DEC 15,2039  18:09:00.0004
 ```
 
 It misses one small solar occultation event near the south pole on July 23, 2036.
-I think it missing this one because I use hard coded planetary constants that I got off of the internet, which may not be particularly accurate.
-
 An algorithm description can be found in `occfind2.pdf`.

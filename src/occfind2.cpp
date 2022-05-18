@@ -3,12 +3,26 @@
 */
 
 #include "Occultations2.hpp"
+#include "occfind2HelpPrint.hpp"
 #include <string>
 #include <cstdlib>
 #include <iostream>
 
 
 int main(int argc, char *argv[]){
+  /* Get occfind configuration Environment Variables
+
+  OCCFIND_DATA_PATH
+  OCCFIND_LSK_BASENAME
+  OCCFIND_SPK_BASENAME
+  OCCFIND_PCK_BASENAME
+
+  This will make it easier to make this an application that can be installed or configured on a unix-like system.
+  All you would need to do is
+  1) put the binaries in a common place (like /bin)
+  2) put the data files in a common place (like /ect/spice)
+  3) set the OCCFIND_DATA_PATH, OCCFIND_LSK_BASENAME, OCCFIND_SPK_BASENAME, and OCCFIND_PCK_BASENAME
+  */
   std::string OCCFIND_DATA_PATH = "./data/"; // default
   if ( const char* env_p = std::getenv("OCCFIND_DATA_PATH") )
   {
@@ -52,13 +66,95 @@ int main(int argc, char *argv[]){
   std::string FilenameSPK = OCCFIND_DATA_PATH + OCCFIND_SPK_BASENAME ;
   std::string FilenamePCK = OCCFIND_DATA_PATH + OCCFIND_PCK_BASENAME;
 
+  // input default time window contraints
   std::string startDateTime="2030 JAN 01";
   std::string endDateTime="2040 JAN 01";
 
-  spice::Occultations2 Occultations2( FilenameLSK , FilenameSPK , FilenamePCK );
-  Occultations2.SetTimeWindow( startDateTime, endDateTime );
+  //
+  std::string observer="EARTH";
+  std::string front="MOON";
+  std::string back="SUN";
+  // input default cspice search bin interval
+  double timeStepSize=180.0; // 3 minutes
 
-  Occultations2.RunSearch();
-  Occultations2.PrintResults();
+  std::vector<std::string> extraKernels;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read CLI arguments and modify default inputs
+  for ( int ii = 0; ii < argc; ii++ )
+  {
+    std::string currentArgument = argv[ii];// convert to c++ string so that I can use c++ string comparison
+    if ((currentArgument == "--help") | (currentArgument=="-h"))
+    {
+      spice::PrintHelp();
+      return 0;
+    }
+    if ((currentArgument == "--lsk") | (currentArgument=="-l"))
+    {
+      ii +=1;
+      FilenameLSK=argv[ii];
+    }
+    if ((currentArgument == "--spk") | (currentArgument=="-s"))
+    {
+      ii +=1;
+      FilenameSPK=argv[ii];
+    }
+    if ((currentArgument == "--pck") | (currentArgument=="-p"))
+    {
+      ii +=1;
+      FilenamePCK=argv[ii];
+    }
+    if ((currentArgument =="--begin") | (currentArgument=="-b"))
+    {
+      ii +=1;
+      startDateTime = argv[ii];
+    }
+    if ((currentArgument =="--end") | (currentArgument=="-e"))
+    {
+      ii +=1;
+      endDateTime = argv[ii];
+    }
+    if ((currentArgument == "--step"))
+    {
+      ii +=1;
+      timeStepSize = std::atof(argv[ii]);
+    }
+    if ((currentArgument == "--set-observer"))
+    {
+      ii +=1;
+      observer = argv[ii];
+    }
+    if ((currentArgument == "--extra-kernels"))
+    {
+      do // assume the remaining inputs are kernel file paths
+      {
+        ii +=1;
+        std::string kernel = argv[ii];
+        extraKernels.push_back(kernel);
+      }
+      while (ii < argc-1);// last argv is always a null pointer
+
+    }
+  }
+
+
+
+  spice::Occultations2 occultations2( FilenameLSK , FilenameSPK , FilenamePCK );
+
+  // load extra kernels
+  for ( int ii = 0; ii < extraKernels.size() ; ii++){
+    occultations2.LoadKernel(extraKernels[ii]);
+  }
+  // set observer, front, and back
+  occultations2.SetObserver(observer);
+  occultations2.SetFront(front);
+  occultations2.SetBack(back);
+  // set search window
+  occultations2.SetTimeWindow(startDateTime,endDateTime);
+  // set the step size
+  occultations2.SetstepSizeET(timeStepSize);
+
+  occultations2.RunSearch();
+  occultations2.PrintResults();
   return 0;
 }

@@ -29,9 +29,6 @@ spice::Occultations2::Occultations2( std::string filenameLSK , std::string filen
   m_halfFrontRevolution = 26.0*24.0*60.0*60.0/2.0; // slightly less than half the time it takes the front to revolve around the earth.
   // Set the default time string format
   m_timeFormat="MON DD,YYYY  HR:MN:SC.####  ::UTC";
-  // truncated cone parameters
-  m_radiusA=m_observerRadius+m_frontRadius/2.0;
-  m_radiusB=m_backRadius+m_frontRadius/2.0;
   m_currentNormal.resize(3);
 }
 
@@ -57,6 +54,7 @@ void spice::Occultations2::SetObserver(std::string object){
   bodvrd_c ( object.c_str(), "RADII", 3, &dim, &values[0] );
   m_observer=object;
   m_observerRadius = *std::max_element(values.begin(),values.end());
+  m_radiusA=m_observerRadius+m_frontRadius/2.0;
 }
 
 void spice::Occultations2::SetFront(std::string object){
@@ -65,6 +63,8 @@ void spice::Occultations2::SetFront(std::string object){
   bodvrd_c ( object.c_str(), "RADII", 3, &dim, &values[0] );
   m_front=object;
   m_frontRadius = *std::max_element(values.begin(),values.end());
+  m_radiusA=m_observerRadius+m_frontRadius/2.0;
+  m_radiusB=m_backRadius+m_frontRadius/2.0;
 }
 
 void spice::Occultations2::SetBack(std::string object){
@@ -73,6 +73,7 @@ void spice::Occultations2::SetBack(std::string object){
   bodvrd_c ( object.c_str(), "RADII", 3, &dim, &values[0] );
   m_back=object;
   m_backRadius = *std::max_element(values.begin(),values.end());
+  m_radiusB=m_backRadius+m_frontRadius/2.0;
 }
 
 void spice::Occultations2::SetstepSizeET( double stepSizeET )

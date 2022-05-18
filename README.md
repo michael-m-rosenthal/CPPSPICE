@@ -386,11 +386,10 @@ Results (UTC):
 
 # occfind2
 
-I made a second program (not a CLI) that computes solar occultation events.
-It is called occfind2.
-The main class is called Occultations2.
-It uses the `spkezr_c` function from cspice.
-
+I made a second program called occfind2 that computes solar occultation events using a truncated cone.
+An algorithm description can be found in `occfind2.pdf`.
+It uses the `spkezr_c` function from cspice to get state vectors.
+It also uses the `bodvrd_c` function from cspice to get the maximum radius planetary constant.
 The results from the program are listed below.
 
 ```
@@ -418,4 +417,3 @@ DEC 15,2039  14:39:00.0004 DEC 15,2039  18:09:00.0004
 ```
 
 It misses one small solar occultation event near the south pole on July 23, 2036.
-An algorithm description can be found in `occfind2.pdf`.

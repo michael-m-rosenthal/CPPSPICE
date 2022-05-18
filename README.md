@@ -383,3 +383,41 @@ Results (UTC):
 	JAN 05,2038  11:30:33.0279 - JAN 05,2038  13:18:38.7113
 	JUN 21,2039  14:48:46.0807 - JUN 21,2039  16:41:56.0064
 ```
+
+# occfind2
+
+I made a second program (not a CLI) that computes solar occultation events.
+It is called occfind2.
+The main class is called Occultations2.
+It uses the `spkezr_c` function from cspice.
+
+The results from the program are listed below.
+
+```
+UN 01,2030  03:53:59.9990 JUN 01,2030  09:02:59.9990
+NOV 25,2030  04:33:00.0009 NOV 25,2030  09:09:00.0009
+MAY 21,2031  04:32:59.9987 MAY 21,2031  09:59:59.9987
+NOV 14,2031  18:39:00.0011 NOV 14,2031  23:33:00.0011
+MAY 09,2032  11:29:59.9985 MAY 09,2032  15:20:59.9985
+NOV 03,2032  03:48:00.0013 NOV 03,2032  07:21:00.0013
+MAR 30,2033  16:20:59.9982 MAR 30,2033  19:44:59.9982
+SEP 23,2033  12:15:00.0015 SEP 23,2033  15:33:00.0015
+MAR 20,2034  07:56:59.9983 MAR 20,2034  12:38:59.9983
+SEP 12,2034  13:45:00.0014 SEP 12,2034  18:54:00.0014
+MAR 09,2035  20:38:59.9984 MAR 10,2035  01:32:59.9984
+SEP 01,2035  23:33:00.0013 SEP 02,2035  04:21:00.0013
+FEB 27,2036  03:14:59.9985 FEB 27,2036  06:17:59.9985
+AUG 21,2036  15:57:00.0011 AUG 21,2036  18:54:00.0011
+JAN 16,2037  08:08:59.9995 JAN 16,2037  11:29:59.9995
+JUL 13,2037  00:33:00.0001 JUL 13,2037  04:45:00.0001
+JAN 05,2038  11:17:59.9998 JAN 05,2038  16:17:59.9998
+JUL 02,2038  10:53:59.9998 JUL 02,2038  16:11:59.9998
+DEC 25,2038  22:36:00.0001 DEC 26,2038  03:24:00.0001
+JUN 21,2039  14:56:59.9995 JUN 21,2039  19:26:59.9995
+DEC 15,2039  14:39:00.0004 DEC 15,2039  18:09:00.0004
+```
+
+It misses one small solar occultation event near the south pole on July 23, 2036.
+I think it missing this one because I use hard coded planetary constants that I got off of the internet, which may not be particularly accurate.
+
+An algorithm description can be found in `occfind2.pdf`.
